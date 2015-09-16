@@ -1,4 +1,4 @@
-# reactiveCocoaTutorial
+# reactiveCocoaTutorial Part1
 
 This project followed step by step the following tutorial by Colin Eberhardt:
 http://www.raywenderlich.com/62699/reactivecocoa-tutorial-pt1
