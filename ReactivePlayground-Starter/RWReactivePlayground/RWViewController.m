@@ -17,8 +17,10 @@
 @property (weak, nonatomic) IBOutlet UIButton *signInButton;
 @property (weak, nonatomic) IBOutlet UILabel *signInFailureText;
 
-@property (nonatomic) BOOL passwordIsValid;
-@property (nonatomic) BOOL usernameIsValid;
+//Comment out non-reactive code
+//@property (nonatomic) BOOL passwordIsValid;
+//@property (nonatomic) BOOL usernameIsValid;
+
 @property (strong, nonatomic) RWDummySignInService *signInService;
 
 @end
@@ -28,15 +30,20 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
-  [self updateUIState];
+  //Comment out non-reactive code
+  //[self updateUIState];
   
   self.signInService = [RWDummySignInService new];
   
+    
+    //Comment out non-reactive code
   // handle text changes for both text fields
-  [self.usernameTextField addTarget:self action:@selector(usernameTextFieldChanged) forControlEvents:UIControlEventEditingChanged];
-  [self.passwordTextField addTarget:self action:@selector(passwordTextFieldChanged) forControlEvents:UIControlEventEditingChanged];
+//  [self.usernameTextField addTarget:self action:@selector(usernameTextFieldChanged) forControlEvents:UIControlEventEditingChanged];
+//  [self.passwordTextField addTarget:self action:@selector(passwordTextFieldChanged) forControlEvents:UIControlEventEditingChanged];
   
   // initially hide the failure message
+    
+    
   self.signInFailureText.hidden = YES;
    
     RACSignal *validUsernameSignal =
@@ -61,6 +68,29 @@
     [validUsernameSignal
      map:^id(NSNumber *passwordValid) {
          return [passwordValid boolValue] ? [UIColor clearColor] : [UIColor yellowColor];
+     }];
+    
+    
+    RACSignal *signUpActiveSignal =
+    [RACSignal combineLatest:@[validUsernameSignal, validPasswordSignal]
+                      reduce:^id(NSNumber *usernameValid, NSNumber *passwordValid) {
+                          return @([usernameValid boolValue] && [passwordValid boolValue]);
+                      }];
+    
+    /* Comment out non-reactive code
+    
+    [signUpActiveSignal subscribeNext:^(NSNumber *signupActive) {
+        self.signInButton.enabled = [signupActive boolValue];
+    }];
+    */
+     
+    
+    //The above code is the orinal version in the tutorial. I replaced it by the following code using RAC Macro
+    
+    RAC(self.signInButton, enabled) =
+    [signUpActiveSignal
+     map:^id(NSNumber *passwordValid) {
+         return @([passwordValid boolValue] );
      }];
 
 }
@@ -91,14 +121,16 @@
 }
 
 
+/* comment cout the non-reactive code
+
+
 // updates the enabled state and style of the text fields based on whether the current username
 // and password combo is valid
 - (void)updateUIState {
     
-  /* comment cout the non-reactive code
-  self.usernameTextField.backgroundColor = self.usernameIsValid ? [UIColor clearColor] : [UIColor yellowColor];
+    self.usernameTextField.backgroundColor = self.usernameIsValid ? [UIColor clearColor] : [UIColor yellowColor];
   self.passwordTextField.backgroundColor = self.passwordIsValid ? [UIColor clearColor] : [UIColor yellowColor];
-   */
+   
   self.signInButton.enabled = self.usernameIsValid && self.passwordIsValid;
 }
 
@@ -112,4 +144,6 @@
   [self updateUIState];
 }
 
+
+*/
 @end
